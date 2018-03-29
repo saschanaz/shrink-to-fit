@@ -1,6 +1,8 @@
 'use strict';
 
-module.exports = shrinkToFit;
+if (typeof module !== "undefined") {
+    module.exports = shrinkToFit;
+}
 
 /**
  * Finds a font size where the specified text can fit in an area of the specified width on
@@ -21,7 +23,8 @@ function shrinkToFit(text, widthPx, settings) {
         maxLines: 2,
         fontFamily: "sans-serif",
         startingSizePx: 90,
-        minSizePx: 30
+        minSizePx: 30,
+        breakAll: false
     };
     var settings = Object.assign({}, defaults, settings);
 
@@ -30,7 +33,7 @@ function shrinkToFit(text, widthPx, settings) {
 
     // intentionally matching on \s and not on \b because we want non-whitespace word
     // boundaries to stay on the same line as the previous word.
-    var words = text.split(/\s+/g),
+    var words = text.split(settings.breakAll ? /\s+/g : ""),
         canvas = document.createElement('canvas'),
         canvasContext = canvas.getContext('2d');
     fontSizeLoop:
@@ -38,9 +41,8 @@ function shrinkToFit(text, widthPx, settings) {
         var numLines = 1;
         canvasContext.font = fontSize + 'px ' + settings.fontFamily;
         var textBuffer = "";
-        lineWrapLoop:
         for (var wordIndex = 0; wordIndex < words.length; wordIndex++) {
-            textBuffer += " " + words[wordIndex];
+            textBuffer += (settings.breakAll ? " " : "") + words[wordIndex];
             var bufferWidth = canvasContext.measureText(textBuffer.trim()).width;
             if (bufferWidth > widthPx) {
                 numLines++;
