@@ -33,7 +33,7 @@ function shrinkToFit(text, widthPx, settings) {
 
     // intentionally matching on \s and not on \b because we want non-whitespace word
     // boundaries to stay on the same line as the previous word.
-    var words = text.split(settings.breakAll ? /\s+/g : ""),
+    var words = text.split(settings.breakAll ? "" : /\s+/g),
         canvas = document.createElement('canvas'),
         canvasContext = canvas.getContext('2d');
     fontSizeLoop:
@@ -42,7 +42,7 @@ function shrinkToFit(text, widthPx, settings) {
         canvasContext.font = fontSize + 'px ' + settings.fontFamily;
         var textBuffer = "";
         for (var wordIndex = 0; wordIndex < words.length; wordIndex++) {
-            textBuffer += (settings.breakAll ? " " : "") + words[wordIndex];
+            textBuffer += (settings.breakAll ? "" : " ") + words[wordIndex];
             var bufferWidth = canvasContext.measureText(textBuffer.trim()).width;
             if (bufferWidth > widthPx) {
                 numLines++;
