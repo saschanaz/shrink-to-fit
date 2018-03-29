@@ -10,12 +10,14 @@ if (typeof module !== "undefined") {
  * to size Y to try to get the font to stay on 2 lines.
  * @param {string} text The text to wrap
  * @param {number} widthPx Width (in px) at which the text will wrap.
- * @param {Object} settings Settings object to override default settings:
+ * @param {Object} [settings] Settings object to override default settings:
  * @param {number} [settings.maxLines=2] Maximum number of lines to which text should wrap.
  * @param {string} [settings.fontFamily="sans serif"] Font face/family to use.
  * @param {number} [settings.startingSizePx=90] Starting font size (in px) to use.
  * @param {number} [settings.minSizePx=30] Minimum font size (in px) to drop to.  Takes higher priority
  * than maxLines -- i.e. if text can't fit on maxLines lines at minSize, it'll return at minSize anyway.
+ * @param {number} [settings.heightPx] Height limit (in px) that the text shouldn't exceed
+ * @param {string} [settings.lineHeightRatio] Line height ratio
  * @returns {number} The font size (in px) to display.
  */
 function shrinkToFit(text, widthPx, settings) {
@@ -24,7 +26,9 @@ function shrinkToFit(text, widthPx, settings) {
         fontFamily: "sans-serif",
         startingSizePx: 90,
         minSizePx: 30,
-        breakAll: false
+        breakAll: false,
+        heightPx: Infinity,
+        lineHeightRatio: 1.5
     };
     var settings = Object.assign({}, defaults, settings);
 
@@ -33,12 +37,14 @@ function shrinkToFit(text, widthPx, settings) {
 
     // intentionally matching on \s and not on \b because we want non-whitespace word
     // boundaries to stay on the same line as the previous word.
-    var words = text.split(settings.breakAll ? "" : /\s+/g),
-        canvas = document.createElement('canvas'),
-        canvasContext = canvas.getContext('2d');
+    var words = text.split(settings.breakAll ? "" : /\s+/g);
+    var canvas = document.createElement('canvas');
+    var canvasContext = canvas.getContext('2d');
     fontSizeLoop:
     for (var fontSize = settings.startingSizePx; fontSize > settings.minSizePx; fontSize--) {
         var numLines = 1;
+        var height = lineHeight;
+        var lineHeight = fontSize * lineHeightRatio;
         canvasContext.font = fontSize + 'px ' + settings.fontFamily;
         var textBuffer = "";
         for (var wordIndex = 0; wordIndex < words.length; wordIndex++) {
@@ -46,7 +52,8 @@ function shrinkToFit(text, widthPx, settings) {
             var bufferWidth = canvasContext.measureText(textBuffer.trim()).width;
             if (bufferWidth > widthPx) {
                 numLines++;
-                if (numLines > settings.maxLines) {
+                height += lineHeight;
+                if (numLines > settings.maxLines || height > settings.heightPx) {
                     continue fontSizeLoop;
                 }
                 // wrap this word to the next line since it didn't fit.
