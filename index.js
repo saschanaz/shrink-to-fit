@@ -44,7 +44,7 @@ function shrinkToFit(text, widthPx, settings) {
     for (var fontSize = settings.startingSizePx; fontSize > settings.minSizePx; fontSize--) {
         var numLines = 1;
         var height = lineHeight;
-        var lineHeight = fontSize * lineHeightRatio;
+        var lineHeight = fontSize * settings.lineHeightRatio;
         canvasContext.font = fontSize + 'px ' + settings.fontFamily;
         var textBuffer = "";
         for (var wordIndex = 0; wordIndex < words.length; wordIndex++) {
