@@ -31,6 +31,7 @@ function shrinkToFit(text, widthPx, settings) {
         lineHeightRatio: 1.5
     };
     var settings = Object.assign({}, defaults, settings);
+    settings.startingSizePx = Math.min(settings.startingSizePx, heightPx / lineHeightRatio);
 
     if (!text || !text.length) return text;
     if (!widthPx) return settings.startingSizePx;
