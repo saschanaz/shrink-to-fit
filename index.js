@@ -43,8 +43,8 @@ function shrinkToFit(text, widthPx, settings) {
     fontSizeLoop:
     for (var fontSize = settings.startingSizePx; fontSize > settings.minSizePx; fontSize--) {
         var numLines = 1;
-        var height = lineHeight;
         var lineHeight = fontSize * settings.lineHeightRatio;
+        var height = lineHeight;
         canvasContext.font = fontSize + 'px ' + settings.fontFamily;
         var textBuffer = "";
         for (var wordIndex = 0; wordIndex < words.length; wordIndex++) {
